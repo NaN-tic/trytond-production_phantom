@@ -75,6 +75,7 @@ class Production:
                     move.company, product, input_.uom, quantity)
                 if new_move:
                     new_move.production_input = self
+                    new_move.planned_date = self.planned_date
                     # TODO: This should be outside the loop
                     new_move.save()
                     cost += Decimal(str(quantity)) * product.cost_price
