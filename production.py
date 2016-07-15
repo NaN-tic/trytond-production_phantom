@@ -10,47 +10,43 @@ class Production:
     __metaclass__ = PoolMeta
 
     def explode_bom(self):
-        Product = Pool().get('product.product')
         Uom = Pool().get('product.uom')
-        Location = Pool().get('stock.location')
 
-        changes = super(Production, self).explode_bom()
-        if not changes.get('inputs', {}).get('add'):
-            return changes
+        super(Production, self).explode_bom()
+        if self.inputs:
 
-        additions = changes['inputs']['add']
-        cost = changes.get('cost', Decimal(0))
+            inputs = self.inputs
+            cost = self.cost
 
-        new_additions = []
-        products = Product.browse([x[1]['product'] for x in additions])
-        for addition, product in izip(additions, products):
-            if not product.phantom:
-                new_additions.append(addition)
-                continue
-            if not product.boms:
-                continue
-            bom = product.boms[0].bom
-            factor = bom.compute_factor(product, addition[1]['quantity'],
-                Uom(addition[1]['uom']))
+            new_inputs = []
+            products = [i.product for i in inputs]
+            for _input, product in izip(inputs, products):
+                if not product.phantom:
+                    new_inputs.append(_input)
+                    continue
+                if not product.boms:
+                    continue
+                bom = product.boms[0].bom
+                factor = bom.compute_factor(product, _input.quantity,
+                    _input.uom)
 
-            from_location = Location(addition[1]['from_location'])
-            to_location = Location(addition[1]['to_location'])
-            uom_quantity = Uom.compute_qty(Uom(addition[1]['uom']),
-                    addition[1]['quantity'], product.default_uom)
-            cost -= (Decimal(str(uom_quantity)) * product.cost_price)
-            for input_ in bom.inputs:
-                quantity = input_.compute_quantity(factor)
-                values = self._explode_move_values(from_location,
-                    to_location,self.company, input_, quantity)
-                if values:
-                    new_additions.append((addition[0], values))
-                    uom_quantity = Uom.compute_qty(input_.uom, quantity,
-                        input_.product.default_uom)
-                    cost += (Decimal(str(uom_quantity)) *
-                        input_.product.cost_price)
-        changes['inputs']['add'] = new_additions
-        changes['cost'] = cost
-        return changes
+                from_location = _input.from_location
+                to_location = _input.to_location
+                uom_quantity = Uom.compute_qty(_input.uom,
+                        _input.quantity, product.default_uom)
+                cost -= (Decimal(str(uom_quantity)) * product.cost_price)
+                for input_ in bom.inputs:
+                    quantity = input_.compute_quantity(factor)
+                    move = self._explode_move_values(from_location,
+                        to_location, self.company, input_, quantity)
+                    if move:
+                        new_inputs.append(move)
+                        uom_quantity = Uom.compute_qty(input_.uom, quantity,
+                            input_.product.default_uom)
+                        cost += (Decimal(str(uom_quantity)) *
+                            input_.product.cost_price)
+            self.inputs = new_inputs
+            self.cost = cost
 
     def set_moves(self):
         Move = Pool().get('stock.move')
