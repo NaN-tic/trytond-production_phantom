@@ -12,22 +12,16 @@ Imports::
     >>> from dateutil.relativedelta import relativedelta
     >>> from decimal import Decimal
     >>> from proteus import config, Model, Wizard
+    >>> from trytond.tests.tools import activate_modules
     >>> from trytond.modules.company.tests.tools import create_company, \
     ...     get_company
     >>> today = datetime.date.today()
     >>> yesterday = today - relativedelta(days=1)
 
-Create database::
-
-    >>> config = config.set_trytond()
-    >>> config.pool.test = True
 
 Install production Module::
 
-    >>> Module = Model.get('ir.module')
-    >>> modules = Module.find([('name', '=', 'production_phantom')])
-    >>> Module.install([x.id for x in modules], config.context)
-    >>> Wizard('ir.module.install_upgrade').execute('upgrade')
+    >>> config = activate_modules('production_phantom')
 
 Create company::
 
@@ -42,13 +36,14 @@ Create product::
     >>> Product = Model.get('product.product')
     >>> product = Product()
     >>> template = ProductTemplate()
+    >>> template.producible = True
     >>> template.name = 'product'
     >>> template.default_uom = unit
     >>> template.type = 'goods'
     >>> template.list_price = Decimal(30)
-    >>> template.cost_price = Decimal(20)
     >>> template.save()
     >>> product.template = template
+    >>> product.cost_price = Decimal(20)
     >>> product.save()
 
 Create Components::
@@ -57,22 +52,24 @@ Create Components::
     >>> template1 = ProductTemplate()
     >>> template1.name = 'component 1'
     >>> template1.default_uom = unit
+    >>> template1.producible =True
     >>> template1.type = 'goods'
     >>> template1.list_price = Decimal(5)
-    >>> template1.cost_price = Decimal(1)
     >>> template1.save()
     >>> component1.template = template1
+    >>> component1.cost_price = Decimal(1)
     >>> component1.save()
 
     >>> component2 = Product()
     >>> template2 = ProductTemplate()
+    >>> template2.producible =True
     >>> template2.name = 'component 2'
     >>> template2.default_uom = unit
     >>> template2.type = 'goods'
     >>> template2.list_price = Decimal(7)
-    >>> template2.cost_price = Decimal(5)
     >>> template2.save()
     >>> component2.template = template2
+    >>> component2.cost_price = Decimal(5)
     >>> component2.save()
 
 Create Sub Components::
@@ -83,9 +80,9 @@ Create Sub Components::
     >>> template1.default_uom = unit
     >>> template1.type = 'goods'
     >>> template1.list_price = Decimal(5)
-    >>> template1.cost_price = Decimal(1)
     >>> template1.save()
     >>> subcomponent1.template = template1
+
     >>> subcomponent1.save()
 
     >>> meter, = ProductUom.find([('name', '=', 'Meter')])
@@ -96,9 +93,9 @@ Create Sub Components::
     >>> template2.default_uom = meter
     >>> template2.type = 'goods'
     >>> template2.list_price = Decimal(7)
-    >>> template2.cost_price = Decimal(5)
     >>> template2.save()
     >>> subcomponent2.template = template2
+    >>> subcomponent2.cost_price = Decimal(5)
     >>> subcomponent2.save()
 
 Create Bill of Material of Component 1::
@@ -164,4 +161,4 @@ Make a production::
     >>> output.quantity == 2
     True
     >>> production.cost
-    Decimal('145.0000')
+    Decimal('95.0000')
