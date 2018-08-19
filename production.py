@@ -10,17 +10,14 @@ class Production:
     __metaclass__ = PoolMeta
 
     def explode_bom(self):
-        Uom = Pool().get('product.uom')
-
         super(Production, self).explode_bom()
         if self.inputs:
 
             inputs = self.inputs
-            cost = self.cost
 
             new_inputs = []
             products = [i.product for i in inputs]
-            for _input, product in izip(inputs, products):
+            for _input, product in zip(inputs, products):
                 if not product.phantom:
                     new_inputs.append(_input)
                     continue
@@ -32,21 +29,13 @@ class Production:
 
                 from_location = _input.from_location
                 to_location = _input.to_location
-                uom_quantity = Uom.compute_qty(_input.uom,
-                        _input.quantity, product.default_uom)
-                cost -= (Decimal(str(uom_quantity)) * product.cost_price)
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
                     move = self._explode_move_values(from_location,
                         to_location, self.company, input_, quantity)
                     if move:
                         new_inputs.append(move)
-                        uom_quantity = Uom.compute_qty(input_.uom, quantity,
-                            input_.product.default_uom)
-                        cost += (Decimal(str(uom_quantity)) *
-                            input_.product.cost_price)
             self.inputs = new_inputs
-            self.cost = cost
 
     def set_moves(self):
         Move = Pool().get('stock.move')

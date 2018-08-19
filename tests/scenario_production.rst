@@ -160,5 +160,6 @@ Make a production::
     >>> output, = production.outputs
     >>> output.quantity == 2
     True
+    >>> production.save()
     >>> production.cost
     Decimal('95.0000')
