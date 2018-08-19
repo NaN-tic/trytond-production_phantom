@@ -1,13 +1,12 @@
 from decimal import Decimal
-from itertools import izip
+
 from trytond.pool import PoolMeta, Pool
 
 __all__ = ['Production']
 
 
-class Production:
+class Production(metaclass=PoolMeta):
     __name__ = 'production'
-    __metaclass__ = PoolMeta
 
     def explode_bom(self):
         super(Production, self).explode_bom()

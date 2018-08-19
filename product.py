@@ -4,9 +4,8 @@ from trytond.pyson import Bool, Eval
 
 __all__ = ['Product']
 
-class Product:
+class Product(metaclass=PoolMeta):
     __name__ = 'product.product'
-    __metaclass__ = PoolMeta
     # TODO: Phantom should only be available with products whose UOM is 'unit'
     phantom = fields.Boolean('Phantom', states={
             'invisible': ~Bool(Eval('boms', [])),
