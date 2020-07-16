@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <data>
-    <xpath expr="/form/field[@name='code']" position="after">
+    <xpath expr="/form/group[@name='code']/field[@name='suffix_code']" position="after">
         <label name="phantom"/>
         <field name="phantom"/>
     </xpath>
