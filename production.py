@@ -1,8 +1,5 @@
 from decimal import Decimal
-
 from trytond.pool import PoolMeta, Pool
-
-__all__ = ['Production']
 
 
 class Production(metaclass=PoolMeta):
