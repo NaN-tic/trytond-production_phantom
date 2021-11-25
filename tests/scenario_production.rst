@@ -85,8 +85,8 @@ Create Sub Components::
 
     >>> subcomponent1.save()
 
-    >>> meter, = ProductUom.find([('name', '=', 'Meter')])
-    >>> centimeter, = ProductUom.find([('name', '=', 'centimeter')])
+    >>> meter, = ProductUom.find([('symbol', '=', 'm')])
+    >>> centimeter, = ProductUom.find([('symbol', '=', 'cm')])
     >>> subcomponent2 = Product()
     >>> template2 = ProductTemplate()
     >>> template2.name = 'subcomponent 2'
