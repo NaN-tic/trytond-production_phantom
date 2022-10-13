@@ -38,7 +38,6 @@ class Production(metaclass=PoolMeta):
     def set_moves(cls, productions):
         Move = Pool().get('stock.move')
         Product = Pool().get('product.product')
-        Template = Pool().get('product.template')
 
         super(Production, cls).set_moves(productions)
         to_delete = []
@@ -65,10 +64,7 @@ class Production(metaclass=PoolMeta):
                         # TODO: This should be outside the loop
                         new_move.save()
                         cost += Decimal(str(quantity)) * product.cost_price
-            if hasattr(Product, 'cost_price'):
-                digits = Product.cost_price.digits
-            else:
-                digits = Template.cost_price.digits
+            digits = Product.cost_price.digits
             if to_delete:
                 for output in production.outputs:
                     if move.product == production.product:
