@@ -1,14 +1,16 @@
 from decimal import Decimal
 from trytond.pool import PoolMeta, Pool
 from trytond.model import dualmethod
+from trytond.modules.product import round_price
+
 
 class Production(metaclass=PoolMeta):
     __name__ = 'production'
 
     def explode_bom(self):
         super(Production, self).explode_bom()
-        if self.inputs:
 
+        if self.inputs:
             inputs = self.inputs
 
             new_inputs = []
@@ -33,13 +35,12 @@ class Production(metaclass=PoolMeta):
                         new_inputs.append(move)
             self.inputs = new_inputs
 
-
     @dualmethod
     def set_moves(cls, productions):
         Move = Pool().get('stock.move')
-        Product = Pool().get('product.product')
 
         super(Production, cls).set_moves(productions)
+
         to_delete = []
         for production in productions:
             cost = Decimal(0)
@@ -64,13 +65,11 @@ class Production(metaclass=PoolMeta):
                         # TODO: This should be outside the loop
                         new_move.save()
                         cost += Decimal(str(quantity)) * product.cost_price
-            digits = Product.cost_price.digits
             if to_delete:
                 for output in production.outputs:
                     if move.product == production.product:
-                        move.unit_price = Decimal(
-                            cost / Decimal(str(output.internal_quantity))
-                            ).quantize(Decimal(str(10 ** -digits[1])))
+                        move.unit_price = round_price(
+                            cost / Decimal(str(output.internal_quantity)))
                         move.save()
                 # TODO: We still miss a way to invalidate the cache of self
                 Move.delete(to_delete)
