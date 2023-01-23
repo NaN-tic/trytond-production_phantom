@@ -29,8 +29,8 @@ class Production(metaclass=PoolMeta):
                 to_location = _input.to_location
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
-                    move = self._explode_move_values(from_location,
-                        to_location, self.company, input_, quantity)
+                    move = self._explode_move_values('input',
+                        input_, quantity)
                     if move:
                         new_inputs.append(move)
             self.inputs = new_inputs
