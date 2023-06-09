@@ -41,8 +41,8 @@ class Production(metaclass=PoolMeta):
 
         super(Production, cls).set_moves(productions)
 
-        to_delete = []
         for production in productions:
+            to_delete = []
             cost = Decimal(0)
             for move in production.inputs:
                 if not move.product.phantom or not move.product.boms:
