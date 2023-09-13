@@ -23,7 +23,7 @@ class Production(metaclass=PoolMeta):
                     continue
                 bom = product.boms[0].bom
                 factor = bom.compute_factor(product, _input.quantity,
-                    _input.uom)
+                    _input.unit)
 
                 from_location = _input.from_location
                 to_location = _input.to_location
@@ -51,13 +51,13 @@ class Production(metaclass=PoolMeta):
                 to_delete.append(move)
                 bom = move.product.boms[0].bom
                 factor = bom.compute_factor(move.product, move.quantity,
-                    move.uom)
+                    move.unit)
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
                     product = input_.product
                     new_move = production._move(move.from_location,
                             move.to_location, move.company, product,
-                            input_.uom, quantity)
+                            input_.unit, quantity)
                     if new_move:
                         new_move.production_input = production
                         new_move.planned_date = production.planned_date
