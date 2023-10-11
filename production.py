@@ -25,8 +25,6 @@ class Production(metaclass=PoolMeta):
                 factor = bom.compute_factor(product, _input.quantity,
                     _input.uom)
 
-                from_location = _input.from_location
-                to_location = _input.to_location
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
                     move = self._explode_move_values('input',
