@@ -27,8 +27,8 @@ class Production(metaclass=PoolMeta):
 
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
-                    move = self._explode_move_values('input',
-                        input_, quantity)
+                    move = self._move('input', input_.product, input_.unit,
+                        quantity)
                     if move:
                         new_inputs.append(move)
             self.inputs = new_inputs
