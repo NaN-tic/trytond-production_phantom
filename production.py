@@ -53,9 +53,8 @@ class Production(metaclass=PoolMeta):
                 for input_ in bom.inputs:
                     quantity = input_.compute_quantity(factor)
                     product = input_.product
-                    new_move = production._move(move.from_location,
-                            move.to_location, move.company, product,
-                            input_.unit, quantity)
+                    new_move = production._move(
+                        'input', product, input_.unit, quantity)
                     if new_move:
                         new_move.production_input = production
                         new_move.planned_date = production.planned_date
